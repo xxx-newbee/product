@@ -1,0 +1,31 @@
+Name: product.rpc
+ListenOn: 0.0.0.0:8083
+Mode: dev
+
+Etcd:
+  Hosts:
+    - 172.10.0.4:2379
+  Key: product.rpc
+
+Database:
+  DataSource: "host=172.10.0.3 user=huangjg password=huangjg@1001 dbname=go-micro port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+  MaxOpenConns: 10
+  MaxIdleConns: 5
+  ConnMaxLifetime: 3600
+
+Cache:
+  Redis:
+    Addr: "172.10.0.2:6379"
+    Password: ""
+    DB: 0
+  Memory: "memory"
+
+Queue:
+  Redis:
+    Addr: "172.10.0.2:6379"
+    Password: ""
+    DB: 1
+    Prefix: "product:queue"
+    MaxRetry: 3
+  Memory:
+    PoolSize: 100

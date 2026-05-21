@@ -1,0 +1,34 @@
+package migrate
+
+import (
+	"github.com/xxx-newbee/product/internal/config"
+	"github.com/xxx-newbee/product/internal/model"
+	"github.com/xxx-newbee/product/internal/svc"
+
+	"github.com/spf13/cobra"
+	"github.com/zeromicro/go-zero/core/conf"
+)
+
+var (
+	configY  string
+	StartCmd = &cobra.Command{
+		Use:     "migrate",
+		Short:   "Run migrations",
+		Long:    "Run migrations",
+		Example: "go run product.go migrate",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return run()
+		},
+	}
+)
+
+func init() {
+	StartCmd.Flags().StringVarP(&configY, "config", "c", "etc/product.yaml", "config file")
+}
+
+func run() error {
+	conf.MustLoad(configY, &config.C)
+	db := svc.InitDB(config.C)
+	err := db.AutoMigrate(model.Category{}, model.Product{}, model.ProductSku{})
+	return err
+}
