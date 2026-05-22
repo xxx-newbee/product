@@ -50,7 +50,7 @@ func (m *defaultProductSkuModel) Insert(data *ProductSku) (uint, error) {
 }
 
 func (m *defaultProductSkuModel) Update(data *ProductSku) error {
-	return m.db.Table(m.table).Where("id = ?", data.ID).Updates(data).Error
+	return m.db.Table(m.table).Where("id = ?", data.ID).Select("*").Updates(data).Error
 }
 
 func (m *defaultProductSkuModel) Delete(id uint) error {

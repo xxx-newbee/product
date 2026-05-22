@@ -55,7 +55,7 @@ func (m *defaultProductModel) Insert(data *Product) (uint, error) {
 }
 
 func (m *defaultProductModel) Update(data *Product) error {
-	return m.db.Table(m.table).Where("id = ?", data.ID).Updates(data).Error
+	return m.db.Table(m.table).Where("id = ?", data.ID).Select("*").Updates(data).Error
 }
 
 func (m *defaultProductModel) Delete(id uint) error {
