@@ -31,8 +31,7 @@ type (
 	}
 
 	defaultProductModel struct {
-		db    *gorm.DB
-		table string
+		db *gorm.DB
 	}
 )
 
@@ -41,10 +40,7 @@ func (Product) TableName() string {
 }
 
 func NewProductModel(db *gorm.DB) ProductModel {
-	return &defaultProductModel{
-		db:    db,
-		table: "products",
-	}
+	return &defaultProductModel{db: db}
 }
 
 func (m *defaultProductModel) Insert(data *Product) (uint, error) {
@@ -55,16 +51,16 @@ func (m *defaultProductModel) Insert(data *Product) (uint, error) {
 }
 
 func (m *defaultProductModel) Update(data *Product) error {
-	return m.db.Table(m.table).Where("id = ?", data.ID).Select("*").Updates(data).Error
+	return m.db.Model(&Product{}).Where("id = ?", data.ID).Select("*").Updates(data).Error
 }
 
 func (m *defaultProductModel) Delete(id uint) error {
-	return m.db.Table(m.table).Where("id = ?", id).Delete(&Product{}).Error
+	return m.db.Model(&Product{}).Where("id = ?", id).Delete(&Product{}).Error
 }
 
 func (m *defaultProductModel) FindById(id uint) (*Product, error) {
 	var p Product
-	res := m.db.Table(m.table).Where("id = ?", id).First(&p)
+	res := m.db.Model(&Product{}).Where("id = ?", id).First(&p)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			return nil, nil
@@ -78,7 +74,7 @@ func (m *defaultProductModel) List(page, pageSize int, categoryId int64, status 
 	var list []*Product
 	var total int64
 
-	query := m.db.Table(m.table)
+	query := m.db.Model(&Product{})
 	if categoryId > 0 {
 		query = query.Where("category_id = ?", categoryId)
 	}
@@ -99,5 +95,5 @@ func (m *defaultProductModel) List(page, pageSize int, categoryId int64, status 
 }
 
 func (m *defaultProductModel) UpdateStatus(id uint, status int) error {
-	return m.db.Table(m.table).Where("id = ?", id).Update("status", status).Error
+	return m.db.Model(&Product{}).Where("id = ?", id).Update("status", status).Error
 }

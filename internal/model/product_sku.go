@@ -26,8 +26,7 @@ type (
 	}
 
 	defaultProductSkuModel struct {
-		db    *gorm.DB
-		table string
+		db *gorm.DB
 	}
 )
 
@@ -36,10 +35,7 @@ func (ProductSku) TableName() string {
 }
 
 func NewProductSkuModel(db *gorm.DB) ProductSkuModel {
-	return &defaultProductSkuModel{
-		db:    db,
-		table: "product_skus",
-	}
+	return &defaultProductSkuModel{db: db}
 }
 
 func (m *defaultProductSkuModel) Insert(data *ProductSku) (uint, error) {
@@ -50,16 +46,16 @@ func (m *defaultProductSkuModel) Insert(data *ProductSku) (uint, error) {
 }
 
 func (m *defaultProductSkuModel) Update(data *ProductSku) error {
-	return m.db.Table(m.table).Where("id = ?", data.ID).Select("*").Updates(data).Error
+	return m.db.Model(&ProductSku{}).Where("id = ?", data.ID).Select("*").Updates(data).Error
 }
 
 func (m *defaultProductSkuModel) Delete(id uint) error {
-	return m.db.Table(m.table).Where("id = ?", id).Delete(&ProductSku{}).Error
+	return m.db.Model(&ProductSku{}).Where("id = ?", id).Delete(&ProductSku{}).Error
 }
 
 func (m *defaultProductSkuModel) FindById(id uint) (*ProductSku, error) {
 	var s ProductSku
-	res := m.db.Table(m.table).Where("id = ?", id).First(&s)
+	res := m.db.Model(&ProductSku{}).Where("id = ?", id).First(&s)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			return nil, nil
@@ -71,6 +67,6 @@ func (m *defaultProductSkuModel) FindById(id uint) (*ProductSku, error) {
 
 func (m *defaultProductSkuModel) FindByProductId(productId uint) ([]*ProductSku, error) {
 	var list []*ProductSku
-	res := m.db.Table(m.table).Where("product_id = ?", productId).Find(&list)
+	res := m.db.Model(&ProductSku{}).Where("product_id = ?", productId).Find(&list)
 	return list, res.Error
 }

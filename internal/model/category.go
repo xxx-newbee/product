@@ -26,8 +26,7 @@ type (
 	}
 
 	defaultCategoryModel struct {
-		db    *gorm.DB
-		table string
+		db *gorm.DB
 	}
 )
 
@@ -36,10 +35,7 @@ func (Category) TableName() string {
 }
 
 func NewCategoryModel(db *gorm.DB) CategoryModel {
-	return &defaultCategoryModel{
-		db:    db,
-		table: "categories",
-	}
+	return &defaultCategoryModel{db: db}
 }
 
 func (m *defaultCategoryModel) Insert(data *Category) (uint, error) {
@@ -50,16 +46,16 @@ func (m *defaultCategoryModel) Insert(data *Category) (uint, error) {
 }
 
 func (m *defaultCategoryModel) Update(data *Category) error {
-	return m.db.Table(m.table).Where("id = ?", data.ID).Select("*").Updates(data).Error
+	return m.db.Model(&Category{}).Where("id = ?", data.ID).Select("*").Updates(data).Error
 }
 
 func (m *defaultCategoryModel) Delete(id uint) error {
-	return m.db.Table(m.table).Where("id = ?", id).Delete(&Category{}).Error
+	return m.db.Model(&Category{}).Where("id = ?", id).Delete(&Category{}).Error
 }
 
 func (m *defaultCategoryModel) FindById(id uint) (*Category, error) {
 	var c Category
-	res := m.db.Table(m.table).Where("id = ?", id).First(&c)
+	res := m.db.Model(&Category{}).Where("id = ?", id).First(&c)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			return nil, nil
@@ -71,18 +67,18 @@ func (m *defaultCategoryModel) FindById(id uint) (*Category, error) {
 
 func (m *defaultCategoryModel) FindByParentId(parentId int64) ([]*Category, error) {
 	var list []*Category
-	res := m.db.Table(m.table).Where("parent_id = ?", parentId).Order("sort_order ASC").Find(&list)
+	res := m.db.Model(&Category{}).Where("parent_id = ?", parentId).Order("sort_order ASC").Find(&list)
 	return list, res.Error
 }
 
 func (m *defaultCategoryModel) FindAll() ([]*Category, error) {
 	var list []*Category
-	res := m.db.Table(m.table).Order("sort_order ASC").Find(&list)
+	res := m.db.Model(&Category{}).Order("sort_order ASC").Find(&list)
 	return list, res.Error
 }
 
 func (m *defaultCategoryModel) CountByParentId(parentId int64) (int64, error) {
 	var count int64
-	res := m.db.Table(m.table).Where("parent_id = ?", parentId).Count(&count)
+	res := m.db.Model(&Category{}).Where("parent_id = ?", parentId).Count(&count)
 	return count, res.Error
 }
